@@ -16,7 +16,7 @@ With the help of open-source technologies, aim is to showcase how much insights 
 
 - In the context used twitter as a datasource and elasticsearch as central data-store for analytics, the configuration looks like
 
-``` xml
+``` ruby
 input {
   twitter {
       consumer_key => "<<CONSUMER_KEY>>"
