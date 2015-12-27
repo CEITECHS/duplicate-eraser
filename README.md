@@ -1,5 +1,5 @@
 # duplicate-eraser
-ELK stack, with twitter stream input. 
+ELK stack, with twitter stream input.
 
 ## USE CASE, FOR LEARNING PURPOSES ONLY
 Streamed tweets with the top two presidential contenders poll results at a constituency level as it was made public and shared on various social media and on twitter in particular.<br/>
@@ -106,7 +106,7 @@ public class DuplicatesFindUtility {
 ```
 
 #References
-- [Grok Debugger](https://grokdebug.herokuapp.com/) 
+- [Grok Debugger](https://grokdebug.herokuapp.com/)
 - [Logistash](https://www.elastic.co/products/logstash)
 - [Elasticsearch](https://www.elastic.co/products/elasticsearch)
 - [Kibana](https://www.elastic.co/products/kibana)
