@@ -2,8 +2,8 @@
 ELK stack, with twitter stream input. 
 
 ## USE CASE, FOR LEARNING PURPOSES ONLY
-Streamed tweets with the top two presidential contenders poll results at a constituency level as it was made public and shared on various social media and on twitter in particular.
-With the help of open-source technologies, aim is to showcase how much insights can be gained from unstructured data, leading to informed decision all around for various purposes.
+Streamed tweets with the top two presidential contenders poll results at a constituency level as it was made public and shared on various social media and on twitter in particular.<br/>
+With the use open-source technologies, aim is to showcase how much insights can be gained from unstructured data, leading to informed decision all around for various purposes.<br/>
 **BE REMINDED THAT** : *Care has not been taken to ensure the accuracy, completeness and reliability of the tweets and it`s contained information , we assumes no responsibility therefore.*  
 
 ##Sample tweets 
@@ -11,10 +11,17 @@ With the help of open-source technologies, aim is to showcase how much insights 
 > - Jimbo Hanang, Manyara Kura: 99,464 @MagufuliJP (CCM):  63,205 @edwardlowassatz (Chadema): 32,367 #tanzaniadecides
 > - Jaji Lubuva Matokeo ya Urais Jimbo la Lindi Mjini Kura: 38,992 @MagufuliJP (CCM): 21,088 @edwardlowassatz (Chadema): 17,607 #tanzaniadecides
 
+# Resulted Dashboard - Kibana
+![screenshot](dashboard-screenshot.png)
+
+**DISCLAIMER :**
+*Care has not been taken to ensure the accuracy, completeness and reliability of the tweets and it`s contained information , we assumes no responsibility therefore.*
+
+
 ###Centralize Data Processing of All Types Ex. TWEETS
 >Logstash is a data pipeline that helps you process logs and other event data from a variety of systems. With 200 plugins and counting, Logstash can connect to a variety of sources and stream data at scale to a central analytics system. <br/>
 
-- In the context used twitter as a datasource and elasticsearch as central data-store for analytics, the configuration looks like
+- In this context used twitter as a logistash datasource and elasticsearch as central data-store for analytics, refer folder **config/** sample configuration looks like
 
 ``` ruby
 input {
@@ -31,7 +38,6 @@ input {
 output {
  if "Kata ya" in [text] and "Kura:" in [text] and "@MagufuliJP (CCM):" in [text] and "@edwardlowassatz (Chadema):" in [text]{
      stdout { codec => rubydebug }
-
     elasticsearch {
 	    protocol => "http"
 	    host => "localhost"
@@ -41,14 +47,63 @@ output {
  }
 
 }
+run command : bin/logstash -f Tanzania-uchaguzi-2015.conf
 ```
 
+### DEALING WITH DUPLICATES
+- Re-tweets etc
+``` java
+public class DuplicatesFindUtility {
 
-# Resulted Dashboard
-![screenshot](dashboard-screenshot.png)
+    public static List<String> findDuplicateResultsIds(Iterable<ConstituencyResult> resultIterable){
+        List<String> duplicateResultsId = new ArrayList<>();
+        Map<String, List<ConstituencyEntity>> resultGroups = StreamSupport
+                .stream(resultIterable.spliterator(), false)
+                .map(ConstituencyEntity::new)
+                .collect(Collectors.groupingBy(ConstituencyEntity::getName));
 
-**DISCLAIMER :**
-*Care has not been taken to ensure the accuracy, completeness and reliability of the tweets and it`s contained information , we assumes no responsibility therefore.*
+        resultGroups.forEach((n, l) -> {
+            if (l.size() > 1) {
+                System.out.println(n + " --- X " + l.size() );
+                for (int i = 1; i < l.size(); i++) {
+                    duplicateResultsId.add(l.get(i).getId());
+
+                };
+            }
+        });
+
+        return duplicateResultsId;
+    }
+
+    private static void deleteDuplicates(String index, String type, List<String> ids){
+        Client client = new TransportClient().addTransportAddress(new InetSocketTransportAddress("localhost", 9300));
+        deleteDuplicateConstituencesByIds(client,index,type,ids);
+    }
+
+    public static void deleteDuplicateConstituencesByIds(Client client, String index, String type, List<String> iDsToDelete){
+        iDsToDelete.forEach(id ->{
+            DeleteResponse deleteResponse = client.prepareDelete(index,type,id)
+                    .execute()
+                    .actionGet();
+            System.out.println(id +" >>>>> " +deleteResponse.isFound());
+        });
+
+    }
+
+    public static void  findAndDeleteDuplicateResultsIds(Iterable<ConstituencyResult> resultIterable){
+        System.out.println("1 : Identifying duplicates.......");
+        List<String> duplicatesIds = findDuplicateResultsIds(resultIterable);
+        System.out.println("2 : found " + duplicatesIds.size() + " duplicates ");
+        if(duplicatesIds.size() > 0){
+            System.out.println("3: Deleting duplicates please wait ......");
+            deleteDuplicates("constituencywitter","constituencytweet",duplicatesIds);
+            System.out.println("5: CleanUp completed successfully");
+        }
+
+    }
+
+}
+```
 
 #References
 - [Grok Debugger](https://grokdebug.herokuapp.com/) 
