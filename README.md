@@ -1,4 +1,4 @@
-# duplicate-eraser
+# DATA ANALYSIS
 ELK stack, with twitter stream input.
 
 ## USE CASE, FOR LEARNING PURPOSES ONLY
