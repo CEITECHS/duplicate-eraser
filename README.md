@@ -113,3 +113,5 @@ public class DuplicatesFindUtility {
 - [Elasticsearch Java API](https://www.elastic.co/guide/en/elasticsearch/client/java-api/current/index.html)
 - [Spring Data Elasticsearch](https://github.com/spring-projects/spring-data-elasticsearch)
 - [Indexing Twitter With Logstash and Elasticsearch](http://david.pilato.fr/blog/2015/06/01/indexing-twitter-with-logstash-and-elasticsearch/)
+
+[CEITECHS](http://www.ceitechs.com) is here to  help you Manage vast amount of data and gain valuable insights you've not imagined 
